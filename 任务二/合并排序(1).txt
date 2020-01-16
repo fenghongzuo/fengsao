@@ -1,0 +1,89 @@
+#include <iostream>
+using namespace std;
+ 
+//有序子列的归并 - 治
+//A - 待排数组、TmpA - 临时数组、L - 左边起始位置、R - 左边起始位置、RightEnd - 左边终点位置
+void Merge(int A[], int TmpA[], int L, int R, int RightEnd)
+{
+	int LeftEnd, ElementNum, Tmp;
+	LeftEnd = R - 1;  //左边终点位置
+	Tmp = L;  //归并后数组的起始位置
+	ElementNum = RightEnd - L + 1;  //元素个数
+ 
+	//归并过程
+	while (L <= LeftEnd && R <= RightEnd)
+	{
+		if (A[L] <= A[R])
+			TmpA[Tmp++] = A[L++];
+		else
+			TmpA[Tmp++] = A[R++];
+	}
+	//解决有剩余元素的子列
+	while (L <= LeftEnd)
+		TmpA[Tmp++] = A[L++];
+	while (R <= RightEnd)
+		TmpA[Tmp++] = A[R++];
+ 
+	//将临时数组中排好序后的元素重新赋值给原数组A 
+	for (int i = 0; i < ElementNum; i++, RightEnd--)
+		A[RightEnd] = TmpA[RightEnd];
+}
+ 
+//采用递归函数的方式实现 - 分
+//A - 待排数组、TmpA - 临时数组、L - 数组左边起始位置、RightEnd - 原数组左边终点位置
+void Msort(int A[], int TmpA[], int L, int RightEnd)
+{
+	int Center;
+ 
+	if (L < RightEnd)  // ==是只剩一个元素，不需要再分
+	{
+		//分
+		Center = (L + RightEnd) / 2;
+		Msort(A, TmpA, L, Center);
+		Msort(A, TmpA, Center + 1, RightEnd);
+		//治
+		Merge(A, TmpA, L, Center + 1, RightEnd);
+	}
+}
+ 
+//为归并排序函数设置统一接口
+void MergeSort(int A[], int N)
+{
+	int *TmpA;  //临时数组
+	TmpA = new int[N];
+ 
+	if (TmpA)
+	{
+		Msort(A, TmpA, 0, N - 1);
+		delete[] TmpA;
+	}
+	else
+		cout << "空间不足" << endl;
+}
+ 
+int main()
+{
+	int N, i;
+	//待排元素个数
+		printf("请输入要排列的个数："); 
+	cin >> N;
+ 
+	int A[N]; 
+	//输入 
+	printf("请输入%d个整数排列: ", N);
+	for(i = 0; i < N; i++)
+	{
+		cin >> A[i];
+	}
+	//归并排序 
+	printf("它们从小到大的顺序为: ");
+	MergeSort(A,N);
+	//输出结果 
+	for(i=0;i < N; i++)
+	{
+		cout << A[i] << " ";
+	}
+	cout << endl;
+	
+	return 0;
+}
