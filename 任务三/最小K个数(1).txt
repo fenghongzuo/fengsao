@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define swap(a,b,t) (t=a,a=b,b=t)
+/**
+* 寻找前k个数
+* 方法2：维护一个大小为k的大顶堆
+**/
+//将无序序列转变成大顶堆序列
+//规定无序元素从数组的1号地址开始填
+void heap_sort_one(int* array, int father_index, int array_len)
+{
+    int child_index=0;
+    int temp=0;
+
+    for(child_index=father_index*2; child_index<=array_len; child_index=child_index*2)
+    {
+        /**这里的child+1是因为后面有个array[child_index+1] 防止溢出**/
+        if(child_index+1<=array_len && array[child_index]<array[child_index+1])
+            child_index++;
+
+        if(child_index<=array_len && array[father_index]<array[child_index])
+        {
+            swap(array[father_index],array[child_index],temp);
+            father_index = child_index; //更新后继续更新孩子结点的左右子树
+        }
+    }
+}
+
+/**寻找最小的K个数 --- 维护一个K个元素的大顶堆
+时间复杂度：建堆费用+更新堆费用=O(klogk+(n-k)logk)=O(nlogk)
+**/
+void heap_sort_topK(int* array, int array_len, int k)
+{
+    int i;
+    int temp=0;
+
+    /**建立一个k的大顶堆**/
+    for(i=k/2; i>=1; i--) /**建堆：从下往上**/
+        heap_sort_one(array,i,k); 
+
+    /**遍历集合setB={n-k,...,n}元素:
+    1）若存在元素b[i]<堆顶元素heapTOP，则swap(b[i],heapTop),重新维护当前前k个元素的大顶堆
+    2）若b[i]>堆顶元素heapTOP，则继续遍历setB中的元素
+    **/
+    for(i=array_len-k; i<=array_len; i++)
+    {
+        if(array[i]<array[1])
+        {
+            swap(array[i],array[1],temp);
+            heap_sort_one(array,1,k); /**更新堆：从上往下**/
+        }
+    }
+    printf("\n");
+    for(i=1; i<=k; i++)
+        printf("%d ",array[i]);
+}
+int main()
+{
+    int i=0;
+    int array1[11]={25,0,4,3,9,10,1,-1,2,100,8};
+    for(i=1; i<11; i++)
+        printf("%d ",array1[i]);
+    printf("\n序列中最小的4个数为：");
+    heap_sort_topK(array1,10,4);
+	printf("\n\n");
+
+
+    return 0;
+
+} 
